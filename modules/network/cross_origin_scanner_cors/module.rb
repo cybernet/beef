@@ -16,10 +16,10 @@ class Cross_origin_scanner_cors < BeEF::Core::Command
       session_id = @datastore['beefhook']
 
       # log the network service
-      if @datastore['results'] =~ /ip=(.+)&port=([\d]+)&status/
-        ip = $1
-        port = $2
-        proto = 'http'
+      if @datastore['results'] =~ /^proto=(https?)&ip=(.+)&port=([\d]+)&status/
+        proto = $1
+        ip = $2
+        port = $3
         type = 'HTTP Server (CORS)'
         if BeEF::Filters.is_valid_ip?(ip)
           print_debug("Hooked browser found HTTP server #{ip}:#{port}")
@@ -34,7 +34,9 @@ class Cross_origin_scanner_cors < BeEF::Core::Command
     return [
         {'name' => 'ipRange', 'ui_label' => 'Scan IP range (C class)', 'value' => '192.168.0.1-192.168.0.254'},
         {'name' => 'ports',   'ui_label' => 'Ports', 'value' => '80,8080'},
-        {'name' => 'threads', 'ui_label' => 'Workers', 'value' => '5'}
+        {'name' => 'threads', 'ui_label' => 'Workers', 'value' => '2'},
+        {'name' => 'wait',    'ui_label' => 'Wait (s) between each request for each worker', 'value' => '2'},
+        {'name' => 'timeout', 'ui_label' => 'Timeout for each request (s)', 'value' => '10'}
     ]
   end
 
